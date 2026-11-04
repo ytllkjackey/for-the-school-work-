@@ -1,286 +1,760 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>學校食堂預訂系統</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome 圖標 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .theme-default { --primary: #059669; --primary-hover: #047857; }
-        .theme-blue { --primary: #2563eb; --primary-hover: #1d4ed8; }
-        .theme-purple { --primary: #7c3aed; --primary-hover: #6d28d9; }
-        .theme-rose { --primary: #e11d48; --primary-hover: #be123c; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>學校食堂預訂系統 | School Canteen Pre-Order System</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .theme-emerald { --primary-color: #10b981; --primary-hover: #059669; }
+    .theme-blue { --primary-color: #3b82f6; --primary-hover: #2563eb; }
+    .theme-purple { --primary-color: #8b5cf6; --primary-hover: #7c3aed; }
+    .theme-amber { --primary-color: #f59e0b; --primary-hover: #d97706; }
+    
+    .bg-primary { background-color: var(--primary-color); }
+    .hover\:bg-primary-hover:hover { background-color: var(--primary-hover); }
+    .text-primary { color: var(--primary-color); }
+    .border-primary { border-color: var(--primary-color); }
 
-        .bg-primary { background-color: var(--primary); }
-        .bg-primary-hover:hover { background-color: var(--primary-hover); }
-        .text-primary { color: var(--primary); }
-        .border-primary { border-color: var(--primary); }
-    </style>
+    /* Font sizes */
+    .font-sm { font-size: 0.875rem; }
+    .font-base { font-size: 1rem; }
+    .font-lg { font-size: 1.125rem; }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans theme-default min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 theme-emerald font-base transition-all duration-200">
 
-    <!-- Top Header Navigation -->
-    <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-primary text-white p-2 rounded-lg text-xl shadow-sm">
-                    <i class="fa-solid fa-utensils"></i>
-                </div>
-                <h1 id="appTitle" class="text-xl font-bold text-slate-800 tracking-tight">學校食堂預訂系統</h1>
-            </div>
-
-            <!-- 控制選項 -->
-            <div class="flex items-center space-x-3">
-                <!-- 切換語言 -->
-                <button onclick="toggleLanguage()" class="px-3 py-1.5 text-sm bg-slate-100 hover:bg-slate-200 rounded-md transition text-slate-700 font-medium flex items-center gap-1.5">
-                    <i class="fa-solid fa-globe"></i>
-                    <span id="langBtnText">English</span>
-                </button>
-                <!-- 購物車數量提示 -->
-                <div class="relative">
-                    <button onclick="scrollToCart()" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-md transition text-slate-700">
-                        <i class="fa-solid fa-cart-shopping text-lg"></i>
-                        <span id="cartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
-                    </button>
-                </div>
-            </div>
+  <!-- Top Header Navigation -->
+  <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-30">
+    <div id="headerContainer" class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="bg-primary text-white p-2 rounded-lg text-xl shadow">
+          <i class="fa-solid fa-utensils"></i>
         </div>
-    </header>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-slate-900" id="appTitle">學校食堂預訂系統</h1>
+          <p class="text-xs text-slate-500 font-medium">
+            <span id="appSubtitle">School Canteen Pre-Order System</span>
+            <span class="ml-2 text-primary font-semibold">| 製作者：Lawrence and Gemini</span>
+          </p>
+        </div>
+      </div>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+      <div class="flex items-center space-x-3">
+        <!-- Bilingual Switch -->
+        <button onclick="toggleLanguage()" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-globe mr-1"></i> <span id="langBtnText">English</span>
+        </button>
+
+        <!-- Current User Info & Logout Button -->
+        <div id="userInfoSection" class="hidden flex items-center space-x-3 pl-3 border-l border-slate-200">
+          <div class="text-right">
+            <div class="text-sm font-bold text-slate-800" id="currentUserName">Lawrence Chan</div>
+            <div class="text-xs text-primary font-semibold" id="currentUserRole">創造者 (Creator)</div>
+          </div>
+          <button onclick="logout()" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition" title="登出">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main id="mainContainer" class="max-w-7xl mx-auto px-4 py-6">
+    
+    <!-- Navigation Tabs -->
+    <div id="navTabs" class="hidden flex space-x-2 border-b border-slate-200 mb-6 overflow-x-auto">
+      <button onclick="switchTab('menu')" id="tab-menu" class="px-4 py-2.5 font-semibold text-sm text-primary border-b-2 border-primary flex items-center space-x-2">
+        <i class="fa-solid fa-book-open"></i> <span id="tabMenuText">菜單點餐</span>
+      </button>
+      <button onclick="switchTab('account')" id="tab-account" class="px-4 py-2.5 font-semibold text-sm text-slate-500 hover:text-slate-800 flex items-center space-x-2">
+        <i class="fa-solid fa-user-gear"></i> <span id="tabAccountText">我的帳號</span>
+      </button>
+      <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-2.5 font-semibold text-sm text-slate-500 hover:text-slate-800 flex items-center space-x-2 hidden">
+        <i class="fa-solid fa-list-check"></i> <span id="tabOrdersText">食堂訂單管理</span>
+      </button>
+      <button onclick="switchTab('admin')" id="tab-admin" class="px-4 py-2.5 font-semibold text-sm text-slate-500 hover:text-slate-800 flex items-center space-x-2 hidden">
+        <i class="fa-solid fa-sliders"></i> <span id="tabAdminText">學校管理員控制台</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: MENU & ORDERING -->
+    <section id="sec-menu" class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <!-- Balance Display -->
+        <div class="flex items-center space-x-4">
+          <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+            <i class="fa-solid fa-wallet text-2xl"></i>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider" id="balanceLabel">當前帳戶餘額</div>
+            <div class="text-2xl font-black text-slate-900" id="userBalanceDisplay">￥150.00</div>
+          </div>
+        </div>
+
+        <!-- Role Badge Info -->
+        <div class="flex items-center space-x-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
+          <span class="text-xs text-slate-500 font-medium" id="roleNoticeLabel">當前身份：</span>
+          <span class="text-xs font-bold text-primary" id="roleBadgeText">學生 Mode</span>
+          <span id="teacherDiscountTag" class="hidden text-[10px] bg-amber-100 text-amber-700 font-bold px-1.5 py-0.5 rounded">享 85 折</span>
+        </div>
+      </div>
+
+      <!-- Food Menu Grid -->
+      <div id="foodGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Dynamic Menu Cards Inserted Here -->
+      </div>
+    </section>
+
+    <!-- TAB 2: MY ACCOUNT & ROLE SWITCH (Creator Only Permission) -->
+    <section id="sec-account" class="hidden space-y-6 max-w-3xl mx-auto">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+        <div class="flex items-center space-x-4 border-b border-slate-100 pb-4">
+          <div class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold">
+            <i class="fa-solid fa-user-astronaut"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-slate-900" id="accountProfileName">Lawrence Chan</h2>
+            <p class="text-sm text-slate-500" id="accountProfileRole">創造者 / 系統開發者</p>
+          </div>
+        </div>
+
+        <!-- Creator Role Switch Box -->
+        <div id="creatorSwitchBox" class="bg-amber-50 border border-amber-200 p-4 rounded-xl space-y-3">
+          <div class="flex items-center space-x-2 text-amber-800 font-bold text-sm">
+            <i class="fa-solid fa-crown text-amber-600"></i>
+            <span id="creatorSwitchTitle">創造者專屬：自由切換系統身份</span>
+          </div>
+          <p class="text-xs text-amber-700" id="creatorSwitchDesc">身為創造者，您可以在此隨時切換為任意角色以體驗或測試系統所有功能：</p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+            <button onclick="creatorSwitchRole('student')" class="p-2.5 bg-white border border-amber-200 hover:border-primary rounded-lg text-xs font-bold text-slate-700 hover:text-primary transition shadow-sm text-center">
+              <i class="fa-solid fa-user-graduate block text-base mb-1 text-emerald-500"></i> 學生 (Student)
+            </button>
+            <button onclick="creatorSwitchRole('teacher')" class="p-2.5 bg-white border border-amber-200 hover:border-primary rounded-lg text-xs font-bold text-slate-700 hover:text-primary transition shadow-sm text-center">
+              <i class="fa-solid fa-chalkboard-user block text-base mb-1 text-blue-500"></i> 教師 (Teacher)
+            </button>
+            <button onclick="creatorSwitchRole('staff')" class="p-2.5 bg-white border border-amber-200 hover:border-primary rounded-lg text-xs font-bold text-slate-700 hover:text-primary transition shadow-sm text-center">
+              <i class="fa-solid fa-utensils block text-base mb-1 text-purple-500"></i> 食堂員工 (Staff)
+            </button>
+            <button onclick="creatorSwitchRole('admin')" class="p-2.5 bg-white border border-amber-200 hover:border-primary rounded-lg text-xs font-bold text-slate-700 hover:text-primary transition shadow-sm text-center">
+              <i class="fa-solid fa-user-shield block text-base mb-1 text-amber-500"></i> 管理員 (Admin)
+            </button>
+          </div>
+        </div>
+
+        <!-- Normal User Info Box -->
+        <div id="normalUserRoleNotice" class="hidden bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <p class="text-xs text-slate-500">一般使用者無法自由切換身份。如需提升權限，請聯繫創造者 (Lawrence) 或學校管理員進行審核分配。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: STAFF ORDERS MANAGEMENT -->
+    <section id="sec-orders" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <h2 class="text-lg font-bold text-slate-900 mb-4" id="staffOrdersTitle">所有學生與教師預訂訂單</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase">
+                <th class="py-3 px-4">訂單號</th>
+                <th class="py-3 px-4">訂購人</th>
+                <th class="py-3 px-4">身份</th>
+                <th class="py-3 px-4">餐點詳情</th>
+                <th class="py-3 px-4">取餐時間</th>
+                <th class="py-3 px-4">實付金額</th>
+                <th class="py-3 px-4">狀態與操作</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody" class="text-sm divide-y divide-slate-100">
+              <!-- Orders inserted dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: ADMIN DASHBOARD (APPROVAL & THEME & MENU) -->
+    <section id="sec-admin" class="hidden space-y-6">
+      
+      <!-- 1. Account Approvals Box -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <i class="fa-solid fa-user-check text-primary"></i>
+            <span id="approvalSectionTitle">新帳號註冊審核與角色分配</span>
+          </h2>
+          <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full" id="pendingCountBadge">0 個待審核</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase">
+                <th class="py-3 px-4">姓名</th>
+                <th class="py-3 px-4">帳號</th>
+                <th class="py-3 px-4">申請角色</th>
+                <th class="py-3 px-4">分配角色與操作</th>
+              </tr>
+            </thead>
+            <tbody id="approvalTableBody" class="text-sm divide-y divide-slate-100">
+              <!-- Pending accounts inserted dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 2. System UI Customization (Admin Only) -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+          <i class="fa-solid fa-palette text-primary"></i>
+          <span id="themeSectionTitle">🎨 系統主題與視覺排版自訂</span>
+        </h2>
         
-        <!-- 左側/上方：餐點清單與分類 (占 2 欄) -->
-        <section class="lg:col-span-2 space-y-4">
-            
-            <!-- 分類切換按鈕 -->
-            <div class="flex items-center space-x-2 overflow-x-auto pb-2 border-b border-slate-200" id="categoryContainer">
-                <button onclick="filterCategory('all')" class="category-btn px-4 py-2 rounded-full text-sm font-semibold bg-primary text-white shadow-sm transition">全部菜單 (20)</button>
-                <button onclick="filterCategory('main')" class="category-btn px-4 py-2 rounded-full text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">經典主食</button>
-                <button onclick="filterCategory('snack')" class="category-btn px-4 py-2 rounded-full text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">小吃點心</button>
-                <button onclick="filterCategory('drink')" class="category-btn px-4 py-2 rounded-full text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">特色飲品</button>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+          <!-- Theme Picker -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-500">主題配色</label>
+            <select id="themeSelect" onchange="changeTheme(this.value)" class="w-full p-2 border border-slate-200 rounded-lg text-sm bg-slate-50">
+              <option value="theme-emerald">薄荷綠 (Emerald)</option>
+              <option value="theme-blue">海洋藍 (Ocean Blue)</option>
+              <option value="theme-purple">高雅紫 (Royal Purple)</option>
+              <option value="theme-amber">暖陽橙 (Warm Amber)</option>
+            </select>
+          </div>
+
+          <!-- Font Size -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-500">字體大小</label>
+            <select id="fontSizeSelect" onchange="changeFontSize(this.value)" class="w-full p-2 border border-slate-200 rounded-lg text-sm bg-slate-50">
+              <option value="font-sm">精簡小字 (Small)</option>
+              <option value="font-base" selected>標準適中 (Medium)</option>
+              <option value="font-lg">舒適大字 (Large)</option>
+            </select>
+          </div>
+
+          <!-- Quick Tools -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-500">快捷操作</label>
+            <div class="flex space-x-2">
+              <button onclick="restockAllMenu()" class="w-1/2 p-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold rounded-lg text-xs transition">一鍵補滿庫存</button>
+              <button onclick="resetSystemData()" class="w-1/2 p-2 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-lg text-xs transition">重置系統數據</button>
             </div>
+          </div>
+        </div>
+      </div>
 
-            <!-- 餐點列表網格 -->
-            <div id="menuGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- 由 JavaScript 動態生成 20 項餐點 -->
+    </section>
+
+  </main>
+
+  <!-- LOGIN / REGISTER AUTH MODAL -->
+  <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-md w-full p-6 space-y-6">
+      
+      <!-- Modal Header -->
+      <div class="text-center space-y-1">
+        <div class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center mx-auto text-2xl font-bold mb-2">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h2 class="text-xl font-bold text-slate-900" id="authTitle">身份驗證與登入</h2>
+        <p class="text-xs text-slate-500" id="authSubtitle">請輸入您的帳號密碼，或進行註冊</p>
+      </div>
+
+      <!-- Auth Mode Switcher -->
+      <div class="flex bg-slate-100 p-1 rounded-lg text-xs font-bold text-slate-600">
+        <button onclick="setAuthMode('login')" id="btnAuthModeLogin" class="w-1/2 py-2 rounded-md bg-white text-slate-900 shadow-sm transition">帳號登入</button>
+        <button onclick="setAuthMode('register')" id="btnAuthModeRegister" class="w-1/2 py-2 rounded-md transition hover:text-slate-900">註冊新帳號</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="formLogin" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">帳號 Username</label>
+          <input type="text" id="loginUsername" required class="w-full p-2.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:outline-none" placeholder="例如：Lawrence 或 student">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">密碼 Password</label>
+          <input type="password" id="loginPassword" required class="w-full p-2.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:outline-none" placeholder="••••••••">
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-lg shadow transition text-sm">
+          確認登入
+        </button>
+
+        <!-- Quick Fill Buttons -->
+        <div class="pt-2 border-t border-slate-100 space-y-2">
+          <p class="text-[11px] text-slate-400 text-center font-medium">快速填寫測試帳號 Quick Fill:</p>
+          <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+            <button type="button" onclick="quickFill('Lawrence', '1234')" class="p-1.5 bg-amber-50 text-amber-800 border border-amber-200 rounded font-bold hover:bg-amber-100">👑 創造者 (Lawrence)</button>
+            <button type="button" onclick="quickFill('student', '1234')" class="p-1.5 bg-slate-50 hover:bg-slate-100 border rounded font-semibold text-slate-700">🎒 學生 (student)</button>
+            <button type="button" onclick="quickFill('teacher', '1234')" class="p-1.5 bg-slate-50 hover:bg-slate-100 border rounded font-semibold text-slate-700">👨‍🏫 教師 (teacher)</button>
+            <button type="button" onclick="quickFill('admin', '1234')" class="p-1.5 bg-slate-50 hover:bg-slate-100 border rounded font-semibold text-slate-700">🏫 管理員 (admin)</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- REGISTER FORM (Pending Approval) -->
+      <form id="formRegister" onsubmit="handleRegister(event)" class="hidden space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">姓名 / Full Name</label>
+          <input type="text" id="regName" required class="w-full p-2 border border-slate-200 rounded-lg text-sm" placeholder="張小明">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">自訂帳號 Username</label>
+          <input type="text" id="regUsername" required class="w-full p-2 border border-slate-200 rounded-lg text-sm" placeholder="ming123">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">設定密碼 Password</label>
+          <input type="password" id="regPassword" required class="w-full p-2 border border-slate-200 rounded-lg text-sm" placeholder="••••••••">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">申請身份 Requested Role</label>
+          <select id="regRole" class="w-full p-2 border border-slate-200 rounded-lg text-sm bg-slate-50">
+            <option value="student">學生 (Student)</option>
+            <option value="teacher">教師 (Teacher)</option>
+            <option value="staff">食堂員工 (Staff)</option>
+            <option value="admin">學校管理員 (Admin)</option>
+          </select>
+        </div>
+
+        <div class="p-2 bg-amber-50 border border-amber-200 rounded-lg text-[11px] text-amber-800">
+          <i class="fa-solid fa-circle-info mr-1"></i> 註冊後需經由創造者 (Lawrence) 或學校管理員審核同意並分配角色後方可登入。
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-lg shadow transition text-sm">
+          提交申請 (Submit Registration)
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <script>
+    // INITIAL SYSTEM DATA
+    const DEFAULT_ACCOUNTS = [
+      { name: 'Lawrence Chan', username: 'Lawrence', password: '1234', role: 'creator', status: 'approved', balance: 500.0 },
+      { name: '陳同學', username: 'student', password: '1234', role: 'student', status: 'approved', balance: 150.0 },
+      { name: '王老師', username: 'teacher', password: '1234', role: 'teacher', status: 'approved', balance: 300.0 },
+      { name: '食堂小張', username: 'staff', password: '1234', role: 'staff', status: 'approved', balance: 0.0 },
+      { name: '林主任', username: 'admin', password: '1234', role: 'admin', status: 'approved', balance: 0.0 }
+    ];
+
+    const DEFAULT_MENU = [
+      { id: 1, name: '招牌黑椒牛柳炒飯', price: 28, stock: 15, rating: 4.8, img: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400' },
+      { id: 2, name: '日式照燒雞腿便當', price: 25, stock: 20, rating: 4.9, img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400' },
+      { id: 3, name: '鮮蝦蔬果沙拉套餐', price: 22, stock: 10, rating: 4.7, img: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400' }
+    ];
+
+    // STATE VARIABLES
+    let accounts = JSON.parse(localStorage.getItem('canteen_accounts')) || DEFAULT_ACCOUNTS;
+    let menu = JSON.parse(localStorage.getItem('canteen_menu')) || DEFAULT_MENU;
+    let orders = JSON.parse(localStorage.getItem('canteen_orders')) || [];
+    let currentUser = JSON.parse(localStorage.getItem('canteen_current_user')) || null;
+    let activeRoleView = localStorage.getItem('canteen_active_role') || null; // For creator switching
+    let currentLang = 'zh';
+
+    // APP INIT
+    window.onload = function() {
+      if (currentUser) {
+        initLoggedInState();
+      } else {
+        showAuthModal();
+      }
+      renderMenu();
+    };
+
+    function saveState() {
+      localStorage.setItem('canteen_accounts', JSON.stringify(accounts));
+      localStorage.setItem('canteen_menu', JSON.stringify(menu));
+      localStorage.setItem('canteen_orders', JSON.stringify(orders));
+      localStorage.setItem('canteen_current_user', JSON.stringify(currentUser));
+      localStorage.setItem('canteen_active_role', activeRoleView);
+    }
+
+    // AUTH & ROLE HANDLING
+    function setAuthMode(mode) {
+      if (mode === 'login') {
+        document.getElementById('formLogin').classList.remove('hidden');
+        document.getElementById('formRegister').classList.add('hidden');
+        document.getElementById('btnAuthModeLogin').className = 'w-1/2 py-2 rounded-md bg-white text-slate-900 shadow-sm transition';
+        document.getElementById('btnAuthModeRegister').className = 'w-1/2 py-2 rounded-md transition hover:text-slate-900';
+      } else {
+        document.getElementById('formLogin').classList.add('hidden');
+        document.getElementById('formRegister').classList.remove('hidden');
+        document.getElementById('btnAuthModeRegister').className = 'w-1/2 py-2 rounded-md bg-white text-slate-900 shadow-sm transition';
+        document.getElementById('btnAuthModeLogin').className = 'w-1/2 py-2 rounded-md transition hover:text-slate-900';
+      }
+    }
+
+    function quickFill(u, p) {
+      document.getElementById('loginUsername').value = u;
+      document.getElementById('loginPassword').value = p;
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('loginUsername').value.trim();
+      const p = document.getElementById('loginPassword').value.trim();
+
+      const acc = accounts.find(a => a.username.toLowerCase() === u.toLowerCase() && a.password === p);
+
+      if (!acc) {
+        alert('帳號或密碼錯誤！');
+        return;
+      }
+
+      if (acc.status === 'pending') {
+        alert('您的帳號尚在等待審核中，請聯繫創造者 (Lawrence) 或管理員開通！');
+        return;
+      }
+
+      currentUser = acc;
+      activeRoleView = acc.role; // Default view is their own role
+      saveState();
+
+      document.getElementById('authModal').classList.add('hidden');
+      initLoggedInState();
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const username = document.getElementById('regUsername').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      const role = document.getElementById('regRole').value;
+
+      if (accounts.some(a => a.username.toLowerCase() === username.toLowerCase())) {
+        alert('此帳號名稱已被註冊！');
+        return;
+      }
+
+      const newAcc = {
+        name,
+        username,
+        password,
+        role: role, // Requested role
+        status: 'pending',
+        balance: role === 'teacher' ? 300.0 : 150.0
+      };
+
+      accounts.push(newAcc);
+      saveState();
+
+      alert('註冊成功！帳號已送出審核，請等待創造者 (Lawrence) 或管理員審核同意。');
+      setAuthMode('login');
+      quickFill(username, password);
+    }
+
+    function logout() {
+      currentUser = null;
+      activeRoleView = null;
+      localStorage.removeItem('canteen_current_user');
+      localStorage.removeItem('canteen_active_role');
+      location.reload();
+    }
+
+    function initLoggedInState() {
+      document.getElementById('userInfoSection').classList.remove('hidden');
+      document.getElementById('navTabs').classList.remove('hidden');
+
+      document.getElementById('currentUserName').innerText = currentUser.name;
+      
+      const roleDisplay = getRoleBadgeTitle(activeRoleView || currentUser.role);
+      document.getElementById('currentUserRole').innerText = roleDisplay;
+      document.getElementById('roleBadgeText').innerText = roleDisplay;
+
+      // Update Balance
+      document.getElementById('userBalanceDisplay').innerText = `￥${(currentUser.balance || 0).toFixed(2)}`;
+
+      // Show/Hide Tabs according to activeRoleView
+      const effectiveRole = activeRoleView || currentUser.role;
+      
+      // Teacher discount notice
+      if (effectiveRole === 'teacher') {
+        document.getElementById('teacherDiscountTag').classList.remove('hidden');
+      } else {
+        document.getElementById('teacherDiscountTag').classList.add('hidden');
+      }
+
+      // Orders tab
+      if (effectiveRole === 'staff' || effectiveRole === 'admin' || effectiveRole === 'creator') {
+        document.getElementById('tab-orders').classList.remove('hidden');
+      } else {
+        document.getElementById('tab-orders').classList.add('hidden');
+      }
+
+      // Admin tab
+      if (effectiveRole === 'admin' || effectiveRole === 'creator') {
+        document.getElementById('tab-admin').classList.remove('hidden');
+      } else {
+        document.getElementById('tab-admin').classList.add('hidden');
+      }
+
+      // Account Tab Setup
+      document.getElementById('accountProfileName').innerText = currentUser.name;
+      document.getElementById('accountProfileRole').innerText = `目前帳號角色：${getRoleBadgeTitle(currentUser.role)}`;
+
+      if (currentUser.role === 'creator') {
+        document.getElementById('creatorSwitchBox').classList.remove('hidden');
+        document.getElementById('normalUserRoleNotice').classList.add('hidden');
+      } else {
+        document.getElementById('creatorSwitchBox').classList.add('hidden');
+        document.getElementById('normalUserRoleNotice').classList.remove('hidden');
+      }
+
+      renderApprovals();
+      renderOrders();
+      renderMenu();
+    }
+
+    function getRoleBadgeTitle(r) {
+      switch(r) {
+        case 'creator': return '👑 創造者 (Creator)';
+        case 'student': return '🎒 學生 (Student)';
+        case 'teacher': return '👨‍🏫 教師 (Teacher)';
+        case 'staff': return '👩‍🍳 食堂員工 (Staff)';
+        case 'admin': return '🏫 學校管理員 (Admin)';
+        default: return r;
+      }
+    }
+
+    // CREATOR ROLE SWITCHING
+    function creatorSwitchRole(targetRole) {
+      if (currentUser.role !== 'creator') {
+        alert('只有創造者 (Lawrence) 能夠自由切換角色！');
+        return;
+      }
+      activeRoleView = targetRole;
+      saveState();
+      initLoggedInState();
+      switchTab('menu');
+      alert(`已成功切換為「${getRoleBadgeTitle(targetRole)}」檢視模式！`);
+    }
+
+    // TAB NAVIGATION
+    function switchTab(tab) {
+      ['menu', 'account', 'orders', 'admin'].forEach(t => {
+        const sec = document.getElementById(`sec-${t}`);
+        const btn = document.getElementById(`tab-${t}`);
+        if (sec && btn) {
+          if (t === tab) {
+            sec.classList.remove('hidden');
+            btn.className = "px-4 py-2.5 font-semibold text-sm text-primary border-b-2 border-primary flex items-center space-x-2";
+          } else {
+            sec.classList.add('hidden');
+            btn.className = "px-4 py-2.5 font-semibold text-sm text-slate-500 hover:text-slate-800 flex items-center space-x-2";
+          }
+        }
+      });
+    }
+
+    // RENDER MENU
+    function renderMenu() {
+      const grid = document.getElementById('foodGrid');
+      grid.innerHTML = '';
+
+      const effectiveRole = activeRoleView || (currentUser ? currentUser.role : 'student');
+      const isTeacher = effectiveRole === 'teacher';
+
+      menu.forEach(item => {
+        const finalPrice = isTeacher ? (item.price * 0.85).toFixed(1) : item.price;
+
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between";
+        card.innerHTML = `
+          <div>
+            <img src="${item.img}" class="w-full h-40 object-cover" alt="${item.name}">
+            <div class="p-4 space-y-2">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-slate-900 text-base">${item.name}</h3>
+                <span class="text-xs font-bold text-amber-500"><i class="fa-solid fa-star"></i> ${item.rating}</span>
+              </div>
+              <div class="flex items-baseline space-x-2">
+                <span class="text-xl font-black text-slate-900">￥${finalPrice}</span>
+                ${isTeacher ? `<span class="text-xs text-slate-400 line-through">￥${item.price}</span>` : ''}
+              </div>
+              <p class="text-xs text-slate-400">剩餘庫存：<span class="font-semibold text-slate-700">${item.stock}</span> 份</p>
             </div>
-        </section>
+          </div>
+          <div class="p-4 pt-0">
+            <button onclick="placeOrder(${item.id})" ${item.stock <= 0 ? 'disabled' : ''} class="w-full py-2 bg-primary hover:bg-primary-hover disabled:bg-slate-300 text-white font-bold text-xs rounded-lg transition">
+              ${item.stock > 0 ? '立即預訂 (Order Now)' : '已售罄'}
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
 
-        <!-- 右側/下方：購物車與結帳區 (占 1 欄) -->
-        <section id="cartSection" class="space-y-4">
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm sticky top-20">
-                <h2 class="text-lg font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center justify-between">
-                    <span><i class="fa-solid fa-receipt mr-2 text-primary"></i>已選購餐點</span>
-                    <button onclick="clearCart()" class="text-xs text-red-500 hover:underline">清空購物車</button>
-                </h2>
+    // PLACE ORDER
+    function placeOrder(itemId) {
+      if (!currentUser) {
+        alert('請先登入！');
+        return;
+      }
 
-                <!-- 購物車清單 -->
-                <div id="cartItems" class="divide-y divide-slate-100 my-4 max-h-80 overflow-y-auto space-y-2">
-                    <p class="text-sm text-slate-400 text-center py-8">購物車是空的，快去挑選喜歡的餐點吧！</p>
-                </div>
+      const item = menu.find(m => m.id === itemId);
+      const effectiveRole = activeRoleView || currentUser.role;
+      const isTeacher = effectiveRole === 'teacher';
+      const cost = isTeacher ? parseFloat((item.price * 0.85).toFixed(1)) : item.price;
 
-                <!-- 費用統計 -->
-                <div class="border-t border-slate-200 pt-3 space-y-1.5 text-sm">
-                    <div class="flex justify-between text-slate-600">
-                        <span>小計</span>
-                        <span>￥<span id="subtotalPrice">0</span></span>
-                    </div>
-                    <div class="flex justify-between font-bold text-base text-slate-800 pt-2 border-t border-dashed border-slate-200">
-                        <span>總計金額</span>
-                        <span class="text-primary text-xl">￥<span id="totalPrice">0</span></span>
-                    </div>
-                </div>
+      if (currentUser.balance < cost) {
+        alert('餘額不足，請先加值！');
+        return;
+      }
 
-                <!-- 提交訂單按鈕 -->
-                <button onclick="checkout()" class="w-full mt-5 py-3 bg-primary bg-primary-hover text-white font-bold rounded-lg shadow transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>立即提交預訂</span>
-                </button>
-            </div>
-        </section>
-    </main>
+      if (item.stock <= 0) {
+        alert('庫存不足！');
+        return;
+      }
 
-    <!-- 底部資訊 -->
-    <footer class="bg-white border-t border-slate-200 mt-12 py-4 text-center text-xs text-slate-400">
-        <p>© 2026 學校食堂預訂系統 - 版權所有</p>
-    </footer>
+      // Deduct Balance & Stock
+      currentUser.balance -= cost;
+      item.stock -= 1;
 
-    <!-- JavaScript 邏輯區塊 -->
-    <script>
-        // 20 項完整菜單資料庫 (包含主食、小吃與飲料)
-        const menuData = [
-            // --- 經典主食 (8項) ---
-            { id: 1, name: '海南雞飯', category: 'main', price: 22, stock: 20, icon: 'fa-drumstick-bite' },
-            { id: 2, name: '日式牛肉咖哩飯', category: 'main', price: 24, stock: 15, icon: 'fa-bowl-rice' },
-            { id: 3, name: '經典義大利肉醬麵', category: 'main', price: 20, stock: 18, icon: 'fa-utensils' },
-            { id: 4, name: '韓式泡菜豬肉飯', category: 'main', price: 22, stock: 12, icon: 'fa-pepper-hot' },
-            { id: 5, name: '香煎雞腿排便當', category: 'main', price: 25, stock: 25, icon: 'fa-box' },
-            { id: 6, name: '廣式叉燒燒鴨雙拼飯', category: 'main', price: 26, stock: 10, icon: 'fa-bowl-food' },
-            { id: 7, name: '蕃茄牛肉燉飯', category: 'main', price: 23, stock: 14, icon: 'fa-plate-wheat' },
-            { id: 8, name: '蔬食素炒麵', category: 'main', price: 16, stock: 20, icon: 'fa-seedling' },
+      // Update current user balance in main accounts array
+      const accIdx = accounts.findIndex(a => a.username === currentUser.username);
+      if (accIdx !== -1) accounts[accIdx].balance = currentUser.balance;
 
-            // --- 小吃點心 (6項) ---
-            { id: 9, name: '黃金香酥雞塊 (6塊)', category: 'snack', price: 12, stock: 30, icon: 'fa-cookie' },
-            { id: 10, name: '美式黃金薯條', category: 'snack', price: 10, stock: 30, icon: 'fa-cubes' },
-            { id: 11, name: '章魚燒 (6顆)', category: 'snack', price: 15, stock: 20, icon: 'fa-circle' },
-            { id: 12, name: '日式煎餃 (5顆)', category: 'snack', price: 12, stock: 25, icon: 'fa-dumpling' },
-            { id: 13, name: '香濃起司熱狗棒', category: 'snack', price: 9, stock: 20, icon: 'fa-hotdog' },
-            { id: 14, name: '黑糖珍珠蛋塔', category: 'snack', price: 8, stock: 15, icon: 'fa-bread-slice' },
+      // Record Order
+      const newOrder = {
+        id: 'ORD' + Math.floor(1000 + Math.random() * 9000),
+        userName: currentUser.name,
+        role: effectiveRole,
+        item: item.name,
+        time: '12:15',
+        price: cost,
+        status: '準備中'
+      };
 
-            // --- 特色飲品 (6項) ---
-            { id: 15, name: '寶礦力水得 (500ml)', category: 'drink', price: 5, stock: 50, icon: 'fa-bottle-water' },
-            { id: 16, name: '經典台式珍珠奶茶', category: 'drink', price: 12, stock: 30, icon: 'fa-glass-water' },
-            { id: 17, name: '鮮榨檸檬紅茶', category: 'drink', price: 8, stock: 40, icon: 'fa-lemon' },
-            { id: 18, name: '巧克力牛奶', category: 'drink', price: 6, stock: 35, icon: 'fa-cow' },
-            { id: 19, name: '冰美式咖啡', category: 'drink', price: 10, stock: 25, icon: 'fa-mug-hot' },
-            { id: 20, name: '芒果生椰拿鐵', category: 'drink', price: 15, stock: 20, icon: 'fa-wine-glass' }
-        ];
+      orders.unshift(newOrder);
+      saveState();
 
-        let cart = [];
-        let currentLang = 'zh';
+      document.getElementById('userBalanceDisplay').innerText = `￥${currentUser.balance.toFixed(2)}`;
+      renderMenu();
+      renderOrders();
 
-        // 渲染菜單
-        function renderMenu(category = 'all') {
-            const menuGrid = document.getElementById('menuGrid');
-            menuGrid.innerHTML = '';
+      alert(`預訂成功！已扣除 ￥${cost}，訂單號為 ${newOrder.id}`);
+    }
 
-            const filteredItems = category === 'all' 
-                ? menuData 
-                : menuData.filter(item => item.category === category);
+    // RENDER ORDERS
+    function renderOrders() {
+      const tbody = document.getElementById('ordersTableBody');
+      tbody.innerHTML = '';
 
-            filteredItems.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition';
-                card.innerHTML = `
-                    <div class="flex items-start space-x-3">
-                        <div class="p-3 bg-emerald-50 text-primary rounded-lg text-2xl flex-shrink-0">
-                            <i class="fa-solid ${item.icon}"></i>
-                        </div>
-                        <div class="flex-grow">
-                            <h3 class="font-bold text-slate-800 text-base">${item.name}</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">每日庫存: ${item.stock} 份</p>
-                            <p class="text-primary font-bold text-lg mt-2">￥${item.price}</p>
-                        </div>
-                    </div>
-                    <button onclick="addToCart(${item.id})" class="w-full mt-3 py-2 bg-primary bg-primary-hover text-white text-sm font-semibold rounded-lg shadow-sm transition flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-plus text-xs"></i> 加入預訂
-                    </button>
-                `;
-                menuGrid.appendChild(card);
-            });
+      orders.forEach(o => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-mono font-bold text-xs text-slate-500">${o.id}</td>
+          <td class="py-3 px-4 font-semibold text-slate-800">${o.userName}</td>
+          <td class="py-3 px-4"><span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-100">${getRoleBadgeTitle(o.role)}</span></td>
+          <td class="py-3 px-4 text-slate-700">${o.item}</td>
+          <td class="py-3 px-4 text-slate-500 text-xs">${o.time}</td>
+          <td class="py-3 px-4 font-bold text-slate-900">￥${o.price}</td>
+          <td class="py-3 px-4">
+            <button onclick="toggleOrderStatus('${o.id}')" class="px-2.5 py-1 text-xs font-bold rounded-lg ${o.status === '已取餐' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+              ${o.status}
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function toggleOrderStatus(orderId) {
+      const o = orders.find(x => x.id === orderId);
+      if (o) {
+        o.status = o.status === '準備中' ? '已取餐' : '準備中';
+        saveState();
+        renderOrders();
+      }
+    }
+
+    // RENDER ACCOUNT APPROVALS (ADMIN / CREATOR)
+    function renderApprovals() {
+      const tbody = document.getElementById('approvalTableBody');
+      tbody.innerHTML = '';
+
+      const pending = accounts.filter(a => a.status === 'pending');
+      document.getElementById('pendingCountBadge').innerText = `${pending.length} 個待審核`;
+
+      if (pending.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-xs text-slate-400">目前沒有待審核的新帳號</td></tr>`;
+        return;
+      }
+
+      pending.forEach(a => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-bold text-slate-800">${a.name}</td>
+          <td class="py-3 px-4 font-mono text-xs text-slate-500">${a.username}</td>
+          <td class="py-3 px-4 text-xs font-semibold text-amber-600">申請：${getRoleBadgeTitle(a.role)}</td>
+          <td class="py-3 px-4 flex items-center space-x-2">
+            <select id="assignRole-${a.username}" class="p-1 border border-slate-200 rounded text-xs bg-slate-50">
+              <option value="student" ${a.role === 'student' ? 'selected' : ''}>學生 (Student)</option>
+              <option value="teacher" ${a.role === 'teacher' ? 'selected' : ''}>教師 (Teacher)</option>
+              <option value="staff" ${a.role === 'staff' ? 'selected' : ''}>食堂員工 (Staff)</option>
+              <option value="admin" ${a.role === 'admin' ? 'selected' : ''}>學校管理員 (Admin)</option>
+            </select>
+            <button onclick="approveAccount('${a.username}', true)" class="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded text-xs">同意開通</button>
+            <button onclick="approveAccount('${a.username}', false)" class="px-2.5 py-1 bg-red-500 hover:bg-red-600 text-white font-bold rounded text-xs">拒絕</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function approveAccount(username, isApproved) {
+      const acc = accounts.find(a => a.username === username);
+      if (acc) {
+        if (isApproved) {
+          const assignedRole = document.getElementById(`assignRole-${username}`).value;
+          acc.role = assignedRole;
+          acc.status = 'approved';
+          alert(`已成功開通 ${acc.name} 的帳號，並分配角色為【${getRoleBadgeTitle(assignedRole)}】！`);
+        } else {
+          accounts = accounts.filter(a => a.username !== username);
+          alert(`已拒絕該帳號申請。`);
         }
+        saveState();
+        renderApprovals();
+      }
+    }
 
-        // 分類過濾按鈕樣式切換
-        function filterCategory(cat) {
-            const buttons = document.querySelectorAll('.category-btn');
-            buttons.forEach(btn => {
-                btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-white', 'text-slate-600');
-            });
-            event.target.classList.remove('bg-white', 'text-slate-600');
-            event.target.classList.add('bg-primary', 'text-white');
-            
-            renderMenu(cat);
-        }
+    // THEME & UTILS
+    function changeTheme(themeName) {
+      document.body.className = document.body.className.replace(/theme-\w+/, themeName);
+    }
 
-        // 加入購物車
-        function addToCart(itemId) {
-            const item = menuData.find(i => i.id === itemId);
-            const cartItem = cart.find(i => i.id === itemId);
+    function changeFontSize(sizeClass) {
+      document.body.className = document.body.className.replace(/font-\w+/, sizeClass);
+    }
 
-            if (cartItem) {
-                cartItem.quantity += 1;
-            } else {
-                cart.push({ ...item, quantity: 1 });
-            }
-            updateCart();
-        }
+    function restockAllMenu() {
+      menu.forEach(m => m.stock = 20);
+      saveState();
+      renderMenu();
+      alert('所有餐點庫存已一鍵補滿為 20 份！');
+    }
 
-        // 更新購物車顯示
-        function updateCart() {
-            const cartContainer = document.getElementById('cartItems');
-            const subtotalPrice = document.getElementById('subtotalPrice');
-            const totalPrice = document.getElementById('totalPrice');
-            const cartBadge = document.getElementById('cartBadge');
+    function resetSystemData() {
+      if (confirm('確定要將所有菜單、帳號與訂單數據恢復為初始狀態嗎？')) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
 
-            if (cart.length === 0) {
-                cartContainer.innerHTML = '<p class="text-sm text-slate-400 text-center py-8">購物車是空的，快去挑選喜歡的餐點吧！</p>';
-                subtotalPrice.innerText = '0';
-                totalPrice.innerText = '0';
-                cartBadge.classList.add('hidden');
-                return;
-            }
-
-            cartContainer.innerHTML = '';
-            let total = 0;
-            let totalCount = 0;
-
-            cart.forEach(item => {
-                total += item.price * item.quantity;
-                totalCount += item.quantity;
-
-                const div = document.createElement('div');
-                div.className = 'py-2 flex items-center justify-between text-sm';
-                div.innerHTML = `
-                    <div class="flex-grow">
-                        <p class="font-medium text-slate-800">${item.name}</p>
-                        <p class="text-xs text-slate-400">￥${item.price} x ${item.quantity}</p>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="changeQuantity(${item.id}, -1)" class="w-6 h-6 bg-slate-100 hover:bg-slate-200 rounded flex items-center justify-center text-slate-600 text-xs font-bold">-</button>
-                        <span class="font-medium text-slate-700 w-4 text-center">${item.quantity}</span>
-                        <button onclick="changeQuantity(${item.id}, 1)" class="w-6 h-6 bg-slate-100 hover:bg-slate-200 rounded flex items-center justify-center text-slate-600 text-xs font-bold">+</button>
-                    </div>
-                `;
-                cartContainer.appendChild(div);
-            });
-
-            subtotalPrice.innerText = total;
-            totalPrice.innerText = total;
-
-            cartBadge.innerText = totalCount;
-            cartBadge.classList.remove('hidden');
-        }
-
-        // 調整數量
-        function changeQuantity(itemId, delta) {
-            const itemIndex = cart.findIndex(i => i.id === itemId);
-            if (itemIndex !== -1) {
-                cart[itemIndex].quantity += delta;
-                if (cart[itemIndex].quantity <= 0) {
-                    cart.splice(itemIndex, 1);
-                }
-            }
-            updateCart();
-        }
-
-        // 清空購物車
-        function clearCart() {
-            cart = [];
-            updateCart();
-        }
-
-        // 提交結帳
-        function checkout() {
-            if (cart.length === 0) {
-                alert('您的購物車目前是空的喔！');
-                return;
-            }
-            alert('🎉 預訂成功！請憑訂單至學校食堂取餐。');
-            clearCart();
-        }
-
-        // 滾動到購物車（行動裝置適用）
-        function scrollToCart() {
-            document.getElementById('cartSection').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // 初始化
-        renderMenu();
-    </script>
+    function toggleLanguage() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      document.getElementById('langBtnText').innerText = currentLang === 'zh' ? 'English' : '繁體中文';
+      document.getElementById('appTitle').innerText = currentLang === 'zh' ? '學校食堂預訂系統' : 'School Canteen Pre-Order System';
+    }
+  </script>
 </body>
 </html>
