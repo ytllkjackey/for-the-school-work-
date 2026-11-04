@@ -20,7 +20,7 @@
         .border-primary { border-color: var(--primary); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans theme-default min-h-screen flex flex-col" id="appBody">
+<body class="bg-slate-50 text-slate-800 font-sans theme-default min-h-screen flex flex-col">
 
     <!-- Top Header Navigation -->
     <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
@@ -29,29 +29,17 @@
                 <div class="bg-primary text-white p-2 rounded-lg text-xl shadow-sm">
                     <i class="fa-solid fa-utensils"></i>
                 </div>
-                <div>
-                    <h1 id="appTitle" class="text-xl font-bold text-slate-800 tracking-tight">學校食堂預訂系統</h1>
-                    <p id="userStatus" class="text-xs text-slate-500">目前身分：一般學生 (<span class="font-mono font-semibold text-slate-700">student01</span>)</p>
-                </div>
+                <h1 id="appTitle" class="text-xl font-bold text-slate-800 tracking-tight">學校食堂預訂系統</h1>
             </div>
 
-            <!-- 右側控制區：快捷登入與其他按鈕 -->
-            <div class="flex items-center space-x-2 sm:space-x-3">
-                <!-- 👑 創作者/管理員快捷登入按鈕 -->
-                <button onclick="quickAdminLogin()" class="px-2.5 py-1.5 text-xs sm:text-sm bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-md transition font-medium flex items-center gap-1 shadow-sm" title="一鍵切換為創作者管理員身分">
-                    <i class="fa-solid fa-crown text-amber-500"></i>
-                    <span class="hidden sm:inline">創作者快捷登入</span>
+            <!-- 控制選項 -->
+            <div class="flex items-center space-x-3">
+                <!-- 切換語言 -->
+                <button onclick="toggleLanguage()" class="px-3 py-1.5 text-sm bg-slate-100 hover:bg-slate-200 rounded-md transition text-slate-700 font-medium flex items-center gap-1.5">
+                    <i class="fa-solid fa-globe"></i>
+                    <span id="langBtnText">English</span>
                 </button>
-
-                <!-- 主題顏色切換 -->
-                <div class="hidden sm:flex items-center space-x-1 border-r border-slate-200 pr-3">
-                    <button onclick="changeTheme('theme-default')" class="w-5 h-5 rounded-full bg-emerald-600 ring-2 ring-offset-1 ring-emerald-600 focus:outline-none"></button>
-                    <button onclick="changeTheme('theme-blue')" class="w-5 h-5 rounded-full bg-blue-600 hover:opacity-80 focus:outline-none"></button>
-                    <button onclick="changeTheme('theme-purple')" class="w-5 h-5 rounded-full bg-purple-600 hover:opacity-80 focus:outline-none"></button>
-                    <button onclick="changeTheme('theme-rose')" class="w-5 h-5 rounded-full bg-rose-600 hover:opacity-80 focus:outline-none"></button>
-                </div>
-
-                <!-- 購物車圖標 -->
+                <!-- 購物車數量提示 -->
                 <div class="relative">
                     <button onclick="scrollToCart()" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-md transition text-slate-700">
                         <i class="fa-solid fa-cart-shopping text-lg"></i>
@@ -65,10 +53,10 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
         
-        <!-- 左側菜單區 (2 欄) -->
+        <!-- 左側/上方：餐點清單與分類 (占 2 欄) -->
         <section class="lg:col-span-2 space-y-4">
             
-            <!-- 完整菜單分類 (維持原樣) -->
+            <!-- 分類切換按鈕 -->
             <div class="flex items-center space-x-2 overflow-x-auto pb-2 border-b border-slate-200" id="categoryContainer">
                 <button onclick="filterCategory('all')" class="category-btn px-4 py-2 rounded-full text-sm font-semibold bg-primary text-white shadow-sm transition">全部菜單 (20)</button>
                 <button onclick="filterCategory('main')" class="category-btn px-4 py-2 rounded-full text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">經典主食</button>
@@ -76,13 +64,13 @@
                 <button onclick="filterCategory('drink')" class="category-btn px-4 py-2 rounded-full text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">特色飲品</button>
             </div>
 
-            <!-- 餐點清單 -->
+            <!-- 餐點列表網格 -->
             <div id="menuGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- 由 JS 生成 20 項餐點 -->
+                <!-- 由 JavaScript 動態生成 20 項餐點 -->
             </div>
         </section>
 
-        <!-- 右側購物車與結帳區 (1 欄) -->
+        <!-- 右側/下方：購物車與結帳區 (占 1 欄) -->
         <section id="cartSection" class="space-y-4">
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm sticky top-20">
                 <h2 class="text-lg font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center justify-between">
@@ -90,10 +78,12 @@
                     <button onclick="clearCart()" class="text-xs text-red-500 hover:underline">清空購物車</button>
                 </h2>
 
+                <!-- 購物車清單 -->
                 <div id="cartItems" class="divide-y divide-slate-100 my-4 max-h-80 overflow-y-auto space-y-2">
                     <p class="text-sm text-slate-400 text-center py-8">購物車是空的，快去挑選喜歡的餐點吧！</p>
                 </div>
 
+                <!-- 費用統計 -->
                 <div class="border-t border-slate-200 pt-3 space-y-1.5 text-sm">
                     <div class="flex justify-between text-slate-600">
                         <span>小計</span>
@@ -105,6 +95,7 @@
                     </div>
                 </div>
 
+                <!-- 提交訂單按鈕 -->
                 <button onclick="checkout()" class="w-full mt-5 py-3 bg-primary bg-primary-hover text-white font-bold rounded-lg shadow transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-paper-plane"></i>
                     <span>立即提交預訂</span>
@@ -113,12 +104,16 @@
         </section>
     </main>
 
+    <!-- 底部資訊 -->
     <footer class="bg-white border-t border-slate-200 mt-12 py-4 text-center text-xs text-slate-400">
         <p>© 2026 學校食堂預訂系統 - 版權所有</p>
     </footer>
 
+    <!-- JavaScript 邏輯區塊 -->
     <script>
+        // 20 項完整菜單資料庫 (包含主食、小吃與飲料)
         const menuData = [
+            // --- 經典主食 (8項) ---
             { id: 1, name: '海南雞飯', category: 'main', price: 22, stock: 20, icon: 'fa-drumstick-bite' },
             { id: 2, name: '日式牛肉咖哩飯', category: 'main', price: 24, stock: 15, icon: 'fa-bowl-rice' },
             { id: 3, name: '經典義大利肉醬麵', category: 'main', price: 20, stock: 18, icon: 'fa-utensils' },
@@ -127,12 +122,16 @@
             { id: 6, name: '廣式叉燒燒鴨雙拼飯', category: 'main', price: 26, stock: 10, icon: 'fa-bowl-food' },
             { id: 7, name: '蕃茄牛肉燉飯', category: 'main', price: 23, stock: 14, icon: 'fa-plate-wheat' },
             { id: 8, name: '蔬食素炒麵', category: 'main', price: 16, stock: 20, icon: 'fa-seedling' },
+
+            // --- 小吃點心 (6項) ---
             { id: 9, name: '黃金香酥雞塊 (6塊)', category: 'snack', price: 12, stock: 30, icon: 'fa-cookie' },
             { id: 10, name: '美式黃金薯條', category: 'snack', price: 10, stock: 30, icon: 'fa-cubes' },
             { id: 11, name: '章魚燒 (6顆)', category: 'snack', price: 15, stock: 20, icon: 'fa-circle' },
             { id: 12, name: '日式煎餃 (5顆)', category: 'snack', price: 12, stock: 25, icon: 'fa-dumpling' },
             { id: 13, name: '香濃起司熱狗棒', category: 'snack', price: 9, stock: 20, icon: 'fa-hotdog' },
             { id: 14, name: '黑糖珍珠蛋塔', category: 'snack', price: 8, stock: 15, icon: 'fa-bread-slice' },
+
+            // --- 特色飲品 (6項) ---
             { id: 15, name: '寶礦力水得 (500ml)', category: 'drink', price: 5, stock: 50, icon: 'fa-bottle-water' },
             { id: 16, name: '經典台式珍珠奶茶', category: 'drink', price: 12, stock: 30, icon: 'fa-glass-water' },
             { id: 17, name: '鮮榨檸檬紅茶', category: 'drink', price: 8, stock: 40, icon: 'fa-lemon' },
@@ -142,11 +141,16 @@
         ];
 
         let cart = [];
+        let currentLang = 'zh';
 
+        // 渲染菜單
         function renderMenu(category = 'all') {
             const menuGrid = document.getElementById('menuGrid');
             menuGrid.innerHTML = '';
-            const filteredItems = category === 'all' ? menuData : menuData.filter(item => item.category === category);
+
+            const filteredItems = category === 'all' 
+                ? menuData 
+                : menuData.filter(item => item.category === category);
 
             filteredItems.forEach(item => {
                 const card = document.createElement('div');
@@ -170,6 +174,7 @@
             });
         }
 
+        // 分類過濾按鈕樣式切換
         function filterCategory(cat) {
             const buttons = document.querySelectorAll('.category-btn');
             buttons.forEach(btn => {
@@ -178,23 +183,15 @@
             });
             event.target.classList.remove('bg-white', 'text-slate-600');
             event.target.classList.add('bg-primary', 'text-white');
+            
             renderMenu(cat);
         }
 
-        function changeTheme(themeName) {
-            document.body.className = `bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col ${themeName}`;
-        }
-
-        // 👑 創作者快捷登入觸發函式
-        function quickAdminLogin() {
-            const statusEl = document.getElementById('userStatus');
-            statusEl.innerHTML = `目前身分：<span class="text-amber-600 font-bold">創作者管理員</span> (<span class="font-mono font-semibold text-slate-700">admin</span>)`;
-            alert('👑 已成功透過快捷按鈕切換為創作者管理員身分！');
-        }
-
+        // 加入購物車
         function addToCart(itemId) {
             const item = menuData.find(i => i.id === itemId);
             const cartItem = cart.find(i => i.id === itemId);
+
             if (cartItem) {
                 cartItem.quantity += 1;
             } else {
@@ -203,6 +200,7 @@
             updateCart();
         }
 
+        // 更新購物車顯示
         function updateCart() {
             const cartContainer = document.getElementById('cartItems');
             const subtotalPrice = document.getElementById('subtotalPrice');
@@ -243,10 +241,12 @@
 
             subtotalPrice.innerText = total;
             totalPrice.innerText = total;
+
             cartBadge.innerText = totalCount;
             cartBadge.classList.remove('hidden');
         }
 
+        // 調整數量
         function changeQuantity(itemId, delta) {
             const itemIndex = cart.findIndex(i => i.id === itemId);
             if (itemIndex !== -1) {
@@ -258,11 +258,13 @@
             updateCart();
         }
 
+        // 清空購物車
         function clearCart() {
             cart = [];
             updateCart();
         }
 
+        // 提交結帳
         function checkout() {
             if (cart.length === 0) {
                 alert('您的購物車目前是空的喔！');
@@ -272,10 +274,12 @@
             clearCart();
         }
 
+        // 滾動到購物車（行動裝置適用）
         function scrollToCart() {
             document.getElementById('cartSection').scrollIntoView({ behavior: 'smooth' });
         }
 
+        // 初始化
         renderMenu();
     </script>
 </body>
